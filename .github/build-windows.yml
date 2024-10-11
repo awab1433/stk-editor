@@ -1,0 +1,43 @@
+name: Build SuperTuxKart Editor
+
+# Trigger the workflow on every push to the 'main' branch and pull request events
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    # Use a Windows runner
+    runs-on: windows-latest
+
+    steps:
+    # Step 1: Checkout the repository (so it can access your code)
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # Step 2: Set up CMake
+    - name: Set up CMake
+      uses: actions/setup-cmake@v3.25.2
+
+    # Step 3: Set up Visual Studio (specifying VS 2019 for compatibility)
+    - name: Set up MSBuild (Visual Studio)
+      uses: microsoft/setup-msbuild@v1
+
+    # Step 4: Configure the CMake project (for Visual Studio 2019)
+    - name: Configure CMake project
+      run: cmake -G "Visual Studio 16 2019" -A x64 .
+
+    # Step 5: Build the project (this builds the SuperTuxKart editor)
+    - name: Build with MSBuild
+      run: cmake --build . --target stk-editor --config Release
+
+    # Step 6: Upload the generated .exe as an artifact you can download
+    - name: Upload build output (exe)
+      uses: actions/upload-artifact@v3
+      with:
+        name: supertuxkart-editor
+        path: .\build\stk-editor.exe  # <-- Adjust the path here to match your output folder
