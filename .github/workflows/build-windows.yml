@@ -1,0 +1,32 @@
+name: Build SuperTuxKart Editor
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up CMake
+      uses: actions/setup-cmake@v3.25.2
+
+    - name: Configure CMake project
+      run: cmake -G "Visual Studio 16 2019" -A x64 .
+
+    - name: Build with MSBuild
+      run: cmake --build . --target stk-editor --config Release
+
+    - name: Archive build output (exe)
+      uses: actions/upload-artifact@v3
+      with:
+        name: supertuxkart-editor
+        path: path\to\generated\exe\file
